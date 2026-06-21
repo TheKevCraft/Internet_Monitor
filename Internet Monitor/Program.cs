@@ -14,6 +14,7 @@ builder.Services.AddHttpClient<IConnectivityService, ConnectivityService>();
 builder.Services.AddSingleton<ISpeedTestService, SpeedTestService>();
 builder.Services.AddSingleton<IDataService, DataService>();
 builder.Services.AddSingleton<IExportService, ExportService>();
+builder.Services.AddSingleton<IExecutionPolicyService, ExecutionPolicyService>();
 
 builder.Services.AddSingleton<ConsoleUiService>();
 builder.Services.AddHostedService<SchedulerService>();
