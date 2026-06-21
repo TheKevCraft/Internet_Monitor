@@ -1,12 +1,7 @@
 ﻿using Internet_Monitor.Interfaces;
 using Internet_Monitor.Models;
-using Internet_Monitor.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.IO.Pipes;
-using System.Text;
 
 namespace Internet_Monitor.BackgroundServices;
 
@@ -74,7 +69,7 @@ public class SchedulerService : BackgroundService
 
         var result = await service.CheckAsync();
 
-        Console.WriteLine($"[Connectivity] Online={result.IsOnline}, Ping={result.PingMs}");
+        //Console.WriteLine($"[Connectivity] Online={result.IsOnline}, Ping={result.PingMs}");
 
         await _dataService.SaveConnectivityAsync(result);
     }
@@ -87,7 +82,7 @@ public class SchedulerService : BackgroundService
 
         var result = await service.RunAsync();
 
-        Console.WriteLine($"[SpeedTest] DL={result.DownloadMbps:F1} Mbps, UL={result.UploadMbps:F1} Mbps");
+        //Console.WriteLine($"[SpeedTest] DL={result.DownloadMbps:F1} Mbps, UL={result.UploadMbps:F1} Mbps");
 
         await _dataService.SaveSpeedTestAsync(result);
     }

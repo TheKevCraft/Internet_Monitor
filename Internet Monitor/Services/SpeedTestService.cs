@@ -41,16 +41,16 @@ public class SpeedTestService : ISpeedTestService
 
             string output = await process.StandardOutput.ReadToEndAsync();
 
-            Console.WriteLine("=== SPEEDTEST RAW OUTPUT ===");
+            /*Console.WriteLine("=== SPEEDTEST RAW OUTPUT ===");
             Console.WriteLine(output);
-            Console.WriteLine("============================");
+            Console.WriteLine("============================");*/
 
             string error = await process.StandardError.ReadToEndAsync();
             
             await process.WaitForExitAsync(cancellationToken);
 
-            Console.WriteLine($"ExitCode: {process.ExitCode}");
-            Console.WriteLine($"Error: {error}");
+            /*Console.WriteLine($"ExitCode: {process.ExitCode}");
+            Console.WriteLine($"Error: {error}");*/
 
             if (process.ExitCode != 0) 
             {

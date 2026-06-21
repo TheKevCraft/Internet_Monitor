@@ -9,7 +9,7 @@ public class SpeedTestResult
 
     public double DownloadMbps { get; set; }
     public double UploadMbps { get; set; }
-    public bool PacketLoss { get; set; }
+    public double PacketLoss { get; set; }
 
     public string? PublicIp { get; set; }
     public string? Isp { get; set; }

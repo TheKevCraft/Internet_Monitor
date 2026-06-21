@@ -1,9 +1,6 @@
 ﻿using Internet_Monitor.Interfaces;
 using Internet_Monitor.Models;
 using Microsoft.Data.Sqlite;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Internet_Monitor.Services;
 
@@ -26,6 +23,7 @@ public class DataService : IDataService
         _connectionString = $"Data Source={dbPath}";
     }
 
+    // Initialize
     public async Task InitializeAsync()
     {
         await using var connection = new SqliteConnection(_connectionString);
@@ -71,6 +69,7 @@ public class DataService : IDataService
         await command.ExecuteNonQueryAsync();
     }
 
+    // Saves
     public async Task SaveConnectivityAsync(ConnectivityResult result)
     {
         await using var connection =
@@ -129,8 +128,7 @@ public class DataService : IDataService
         await command.ExecuteNonQueryAsync();
     }
 
-    public async Task SaveSpeedTestAsync(
-    SpeedTestResult result)
+    public async Task SaveSpeedTestAsync(SpeedTestResult result)
     {
         await using var connection =
             new SqliteConnection(_connectionString);
@@ -181,5 +179,166 @@ public class DataService : IDataService
         command.Parameters.AddWithValue("$serverLocation", result.ServerLocation ?? "");
 
         await command.ExecuteNonQueryAsync();
+    }
+
+    // Get`s
+    public async Task<List<ConnectivityResult>> GetConnectivityHistoryAsync(int limit = 100)
+    {
+        var results = new List<ConnectivityResult>();
+
+        await using var connection =
+            new SqliteConnection(_connectionString);
+
+        await connection.OpenAsync();
+
+        var command = connection.CreateCommand();
+
+        command.CommandText =
+        """
+        SELECT *
+        FROM ConnectivityResults
+        ORDER BY Timestamp DESC
+        LIMIT $limit;
+        """;
+
+        command.Parameters.AddWithValue("$limit", limit);
+
+        await using var reader = 
+            await command.ExecuteReaderAsync();
+
+        while (await reader.ReadAsync())
+        {
+            results.Add(new ConnectivityResult
+            {
+                Timestamp = DateTime.Parse(reader["Timestamp"].ToString()!),
+                PingSuccess = Convert.ToBoolean(reader["PingSuccess"]),
+                PingMs = reader["PingMs"] == DBNull.Value
+                ? null
+                : Convert.ToInt64(reader["PingMs"]),
+                DnsSuccess = Convert.ToBoolean(reader["DnsSuccess"]),
+                HttpSuccess = Convert.ToBoolean(reader["HttpSuccess"])
+            });
+        }
+
+        return results;
+    }
+
+    public async Task<List<SpeedTestResult>> GetSpeedTestHistoryAsync(int limit = 100)
+    {
+        var results = new List<SpeedTestResult>();
+
+        await using var connection =
+            new SqliteConnection(_connectionString);
+
+        await connection.OpenAsync();
+
+        var command = connection.CreateCommand();
+
+        command.CommandText =
+        """
+    SELECT *
+    FROM SpeedTests
+    ORDER BY Timestamp DESC
+    LIMIT $limit;
+    """;
+
+        command.Parameters.AddWithValue("$limit", limit);
+
+        await using var reader =
+            await command.ExecuteReaderAsync();
+
+        while (await reader.ReadAsync())
+        {
+            results.Add(new SpeedTestResult
+            {
+                Timestamp = DateTime.Parse(reader["Timestamp"].ToString()!),
+                PingMs = Convert.ToDouble(reader["PingMs"]),
+                Jitter = Convert.ToDouble(reader["Jitter"]),
+                DownloadMbps = Convert.ToDouble(reader["DownloadMbps"]),
+                UploadMbps = Convert.ToDouble(reader["UploadMbps"]),
+                PacketLoss = Convert.ToDouble(reader["PacketLoss"]),
+                PublicIp = reader["PublicIp"]?.ToString(),
+                Isp = reader["Isp"]?.ToString(),
+                ServerName = reader["ServerName"]?.ToString(),
+                ServerLocation = reader["ServerLocation"]?.ToString(),
+                Success = true
+            });
+        }
+
+        return results;
+    }
+
+    public async Task<ConnectivityResult?> GetLatestConnectivityAsync()
+    {
+        await using var connection =
+            new SqliteConnection(_connectionString);
+
+        await connection.OpenAsync();
+
+        var command = connection.CreateCommand();
+
+        command.CommandText =
+        """
+    SELECT *
+    FROM ConnectivityResults
+    ORDER BY Timestamp DESC
+    LIMIT 1;
+    """;
+
+        await using var reader =
+            await command.ExecuteReaderAsync();
+
+        if (!await reader.ReadAsync())
+            return null;
+
+        return new ConnectivityResult
+        {
+            Timestamp = DateTime.Parse(reader["Timestamp"].ToString()!),
+            PingSuccess = Convert.ToBoolean(reader["PingSuccess"]),
+            PingMs = reader["PingMs"] == DBNull.Value
+                ? null
+                : Convert.ToInt64(reader["PingMs"]),
+            DnsSuccess = Convert.ToBoolean(reader["DnsSuccess"]),
+            HttpSuccess = Convert.ToBoolean(reader["HttpSuccess"])
+        };
+    }
+
+    public async Task<SpeedTestResult?> GetLatestSpeedTestAsync()
+    {
+        await using var connection =
+            new SqliteConnection(_connectionString);
+
+        await connection.OpenAsync();
+
+        var command = connection.CreateCommand();
+
+        command.CommandText =
+        """
+    SELECT *
+    FROM SpeedTests
+    ORDER BY Timestamp DESC
+    LIMIT 1;
+    """;
+
+        await using var reader =
+            await command.ExecuteReaderAsync();
+
+        if (!await reader.ReadAsync())
+            return null;
+
+        return new SpeedTestResult
+        {
+            Timestamp = DateTime.Parse(reader["Timestamp"].ToString()!),
+            PingMs = Convert.ToDouble(reader["PingMs"]),
+            Jitter = Convert.ToDouble(reader["Jitter"]),
+            DownloadMbps = Convert.ToDouble(reader["DownloadMbps"]),
+            UploadMbps = Convert.ToDouble(reader["UploadMbps"]),
+            PacketLoss = Convert.ToDouble(reader["PacketLoss"]),
+            PublicIp = reader["PublicIp"]?.ToString(),
+            Isp = reader["Isp"]?.ToString(),
+            ServerName = reader["ServerName"]?.ToString(),
+            ServerLocation = reader["ServerLocation"]?.ToString(),
+            Success = true
+        };
     }
 }
