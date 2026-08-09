@@ -1,5 +1,4 @@
 <Solution>
-  <Project Path="Internet Monitor/Internet_Monitor.csproj" />
   <Project Path="InternetMonitor.CLI/InternetMonitor.CLI.csproj" />
   <Project Path="InternetMonitor.Core/InternetMonitor.Core.csproj" />
 </Solution>

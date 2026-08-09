@@ -1,12 +1,9 @@
-using System.Runtime;
-using InternetMonitor.Core.BackgroundServices;
 using InternetMonitor.Core.Config;
 using InternetMonitor.Core.Data;
 using InternetMonitor.Core.Interfaces;
 using InternetMonitor.Core.Services;
 using InternetMonitor.Core.Services.Exporter;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 public static class ServiceCollectionExtensions
 {
