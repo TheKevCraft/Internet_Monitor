@@ -1,0 +1,5 @@
+[Connectivity]
+PingHost = "1.1.1.1"
+DnsHost = "google.com"
+HttpUrl = "https://connectivitycheck.gstatic.com/generate_204"
+PingTimeout = 3000
