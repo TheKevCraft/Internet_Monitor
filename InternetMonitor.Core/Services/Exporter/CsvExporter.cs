@@ -9,39 +9,172 @@ internal class CsvExporter : IExporter
 {
     public ExportFormat Format => ExportFormat.Csv;
 
-    public async Task<string> ExportAsync(InternetExportData data, CancellationToken token = default)
+    public async Task<ExportResult> ExportAsync(InternetExportData data, CancellationToken token = default)
     {
-        var path = CreatePath("InternetReport", "csv");
+        var timestamp = DateTime.UtcNow.ToString(
+            "yyyy-MM-dd_HH-mm-ss", 
+            CultureInfo.InvariantCulture);
 
-        var rows = data.SpeedTests.Select(x =>
-            string.Join(",",
-            x.Timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),
-            x.PingMs.ToString(CultureInfo.InvariantCulture) ?? "",
-            x.DownloadMbps.ToString(CultureInfo.InvariantCulture),
-            x.UploadMbps.ToString(CultureInfo.InvariantCulture),
-            x.Jitter.ToString(CultureInfo.InvariantCulture),
-            x.PacketLoss.ToString(CultureInfo.InvariantCulture),
-            CsvEscape(x.Isp),
-            CsvEscape(x.ServerName)));
+        var folder = CreateExportFolder();
 
-        await ExportCsvAsync(
-            path,
-            "Timestamp,PingMs,Download,Upload,Jitter,PacketLoss,ISP,ServerName",
-            rows,
+        var summaryPath = Path.Combine(
+            folder,
+            $"InternetReport_{timestamp}_summary.csv");
+
+        var connectivityPath = Path.Combine(
+            folder,
+            $"InternetReport_{timestamp}_connectivity.csv");
+
+        var speedTestsPath = Path.Combine(
+            folder,
+            $"InternetReport_{timestamp}_speedtests.csv");
+
+        await ExportSummaryAsync(
+            summaryPath,
+            data.Summary,
             token);
 
-        return path;
+        await ExportConnectivityAsync(
+            connectivityPath,
+            data.Connectivity,
+            token);
+
+        await ExportSpeedTestsAsync(
+            speedTestsPath,
+            data.SpeedTests,
+            token);
+
+        return new ExportResult
+        {
+            Format = Format,
+            GeneratedAt = data.GeneratedAt,
+            Files = 
+            [
+                summaryPath,
+                connectivityPath,
+                speedTestsPath
+            ]
+        };
     }
 
-    private static string CreatePath(string name, string extension)
+    #region Export Tabels
+
+    private static async Task ExportSummaryAsync(
+        string filePath,
+        InternetReport report,
+        CancellationToken token)
     {
-        var folder = Path.Combine(AppContext.BaseDirectory, "exports");
+        var sb = new StringBuilder();
+
+        sb.AppendLine(
+            "GeneratedAt,UpTimePercent,AveragePing,AverageDownload,AverageUpload,OfflineEvents,SpeedTestCount");
+
+        sb.AppendLine(string.Join(",",
+            FormatDateTime(report.GeneratedAt),
+            FormatNunber(report.UptimePercent),
+            FormatNunber(report.AveragePing),
+            FormatNunber(report.AverageDownload),
+            FormatNunber(report.AverageUpload),
+            report.OfflineEvents.ToString(CultureInfo.InvariantCulture),
+            report.SpeedTestCount.ToString(CultureInfo.InvariantCulture)));
+
+        await WriteFilesAsync(filePath, sb.ToString(), token);
+    }
+
+    private static async Task ExportConnectivityAsync(
+        string filePath,
+        IEnumerable<ConnectivityResult> results,
+        CancellationToken token)
+    {
+        var sb = new StringBuilder();
+
+        sb.AppendLine(
+            "Timestamp,PingSuccess,PingMs,DnsSuccess,HttpSuccess,IsOnline");
+
+        foreach (var result in results)
+        {
+            sb.AppendLine(string.Join(",",
+                FormatDateTime(result.Timestamp),
+                result.PingSuccess,
+                result.PingMs?.ToString(CultureInfo.InvariantCulture) ?? "",
+                result.DnsSuccess,
+                result.HttpSuccess,
+                result.IsOnline));
+        }
+
+        await WriteFilesAsync(filePath, sb.ToString(), token);
+    }
+
+    private static async Task ExportSpeedTestsAsync(
+        string filePath,
+        IEnumerable<SpeedTestResult> results,
+        CancellationToken token)
+    {
+        var sb = new StringBuilder();
+
+        sb.AppendLine("Timestamp,PingMs,Jitter,DownloadMbps,UploadMbps,PacketLoss,PublicIp,ISP,ServerName,ServerLocation,Success,Error");
+
+        foreach (var result in results)
+        {
+            sb.AppendLine(string.Join(",",
+                FormatDateTime(result.Timestamp),
+                FormatNunber(result.PingMs),
+                FormatNunber(result.Jitter),
+                FormatNunber(result.DownloadMbps),
+                FormatNunber(result.UploadMbps),
+                FormatNunber(result.PacketLoss),
+                CsvEscape(result.PublicIp),
+                CsvEscape(result.Isp),
+                CsvEscape(result.ServerName),
+                CsvEscape(result.ServerLocation),
+                result.Success,
+                CsvEscape(result.Error)));
+        }
+
+        await WriteFilesAsync(filePath, sb.ToString(), token);
+    }
+
+    #endregion
+
+    #region Helpers
+
+    private static string CreateExportFolder()
+    {
+        var folder = Path.Combine(
+            AppContext.BaseDirectory,
+            "exports");
 
         Directory.CreateDirectory(folder);
 
-        return Path.Combine(
-            folder,
-            $"{name}_{DateTime.UtcNow:yyyy-MM-dd_HH-mm-ss}.{extension}");
+        return folder;
+    }
+
+    private static async Task WriteFilesAsync(
+        string filePath,
+        string content,
+        CancellationToken token)
+    {
+        var encoding = new UTF8Encoding(
+            encoderShouldEmitUTF8Identifier: true);
+
+        await File.WriteAllTextAsync(
+            filePath,
+            content,
+            encoding,
+            token);
+    }
+
+    private static string FormatDateTime(DateTime value)
+    {
+        return value.ToString(
+            "yyyy-MM-dd HH:mm:ss",
+            CultureInfo.InvariantCulture);
+    }
+
+    private static string FormatNunber(double value)
+    {
+        return value.ToString(
+            CultureInfo.InvariantCulture);
     }
 
     private static string CsvEscape(string? value)
@@ -60,17 +193,5 @@ internal class CsvExporter : IExporter
         return $"\"{value.Replace("\"", "\"\"")}\"";
     }
 
-    private static async Task ExportCsvAsync(string filePath, string header, IEnumerable<string> rows, CancellationToken token = default)
-    {
-        var sb = new StringBuilder();
-
-        sb.AppendLine(header);
-
-        foreach (var row in rows)
-            sb.AppendLine(row);
-
-        var endcoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
-
-        await File.WriteAllTextAsync(filePath, sb.ToString(), endcoding, token);
-    }
+    #endregion
 }

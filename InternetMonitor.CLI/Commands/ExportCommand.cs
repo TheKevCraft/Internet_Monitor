@@ -39,12 +39,12 @@ public sealed class ExportCommand : ICommandModule
 
             try
             {
-                var file = await _exportService.ExportAsync(
+                var result = await _exportService.ExportAsync(
                     format,
                     limit,
                     token);
 
-                ConsoleOutput.PrintSuccess($"Export completed: {file}");
+                ConsoleOutput.PrintExport(result);
             }
             catch (Exception ex)
             {

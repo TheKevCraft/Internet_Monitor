@@ -13,7 +13,7 @@ internal class JsonExporter : IExporter
         WriteIndented = true
     };
 
-    public async Task<string> ExportAsync(InternetExportData data, CancellationToken token = default)
+    public async Task<ExportResult> ExportAsync(InternetExportData data, CancellationToken token = default)
     {
         var path = CreatePath("InternetReport", "json");
 
@@ -21,7 +21,12 @@ internal class JsonExporter : IExporter
 
         await File.WriteAllTextAsync(path, json, token);
 
-        return path;
+        return new ExportResult
+        {
+            Format = Format,
+            GeneratedAt = data.GeneratedAt,
+            Files = [path]
+        };
     }
 
     private static string CreatePath(string name, string extension)

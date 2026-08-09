@@ -8,7 +8,7 @@ internal class PdfReportExporter : IExporter
 {
     public ExportFormat Format => ExportFormat.Pdf;
 
-    public Task<string> ExportAsync(InternetExportData data, CancellationToken token = default)
+    public Task<ExportResult> ExportAsync(InternetExportData data, CancellationToken token = default)
     {
         var folder = Path.Combine(AppContext.BaseDirectory, "reports");
 
@@ -56,6 +56,11 @@ internal class PdfReportExporter : IExporter
         })
         .GeneratePdf(path);
 
-        return Task.FromResult(path);
+        return Task.FromResult(new ExportResult
+        {
+            Format = Format,
+            GeneratedAt = data.GeneratedAt,
+            Files = [path]
+        });
     }
 }

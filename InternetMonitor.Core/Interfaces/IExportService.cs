@@ -4,5 +4,8 @@ namespace InternetMonitor.Core.Interfaces;
 
 public interface IExportService
 {
-    Task<string> ExportAsync(ExportFormat format, int limit, CancellationToken token = default);
+    Task<ExportResult> ExportAsync(
+        ExportFormat format, 
+        int limit, 
+        CancellationToken token = default);
 }

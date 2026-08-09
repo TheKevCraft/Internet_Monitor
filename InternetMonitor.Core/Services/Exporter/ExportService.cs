@@ -23,7 +23,7 @@ public class ExportService : IExportService
         _logger = logger;
     }
 
-    public async Task<string> ExportAsync(
+    public async Task<ExportResult> ExportAsync(
         ExportFormat format,
         int limit,  
         CancellationToken token = default)

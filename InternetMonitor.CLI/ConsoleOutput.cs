@@ -24,6 +24,48 @@ internal static class ConsoleOutput
         Console.WriteLine();
     }
 
+    public static void PrintExport(ExportResult result)
+    {
+        Console.WriteLine();
+        Console.WriteLine($"Export completed: {result.Format}");
+        Console.WriteLine($"Generated: {result.GeneratedAt:yyyy-MM-dd HH:mm:ss} UTC");
+        Console.WriteLine();
+
+        if (!result.Success)
+        {
+            Console.WriteLine("No files were generated.");
+            return;
+        }
+
+        if (result.Files.Count == 1)
+        {
+            Console.WriteLine($"File: {result.Files[0]}");
+        }
+        else
+        {
+            Console.WriteLine($"Files ({result.Files.Count}):");
+
+            foreach (var file in result.Files)
+            {
+                PrintFileLink(file);
+            }
+        }
+        Console.WriteLine();
+    }
+
+    // Links
+    private static void PrintFileLink(string file)
+    {
+        var fullPath = Path.GetFullPath(file);
+        var uri = new Uri(fullPath);
+
+        Console.WriteLine(
+            $" - \u001b]8;;{uri.AbsoluteUri}\u0007" +
+            $"{fullPath}" + 
+            "\u001b]8;;\u0007");
+    }
+
+    // Basics
     public static void PrintMessage(string message)
     {
         Console.WriteLine(message);
