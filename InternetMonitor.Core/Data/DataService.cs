@@ -1,7 +1,6 @@
-﻿using InternetMonitor.Core.Config;
+﻿using InternetMonitor.Core.Configs.Options;
 using InternetMonitor.Core.Interfaces;
 using InternetMonitor.Core.Models;
-using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 
 namespace InternetMonitor.Core.Data;
@@ -11,7 +10,7 @@ public class DataService : IDataService
     private readonly ILogger<DataService> _logger;
     private readonly SqliteConnectionFactory _factory;
 
-    public DataService(DatabaseOptions options, ILogger<DataService> logger, SqliteConnectionFactory factory)
+    public DataService(ILogger<DataService> logger, SqliteConnectionFactory factory)
     {
         _logger = logger;
         _factory = factory;

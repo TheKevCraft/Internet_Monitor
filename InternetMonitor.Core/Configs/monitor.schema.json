@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InternetMonitor Configuration",
+  "type": "object",
+  "properties": {
+    "monitor": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enables or disables the Internet Monitor."
+        },
+        "interval": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monitoring interval in seconds."
+        }
+      },
+      "required": [
+        "enabled",
+        "interval"
+      ],
+      "additionalProperties": false
+    },
+    "connectivity": {
+      "type": "object",
+      "properties": {
+        "ping_host": {
+          "type": "string",
+          "description": "Host used for ICMP ping tests."
+        },
+        "dns_host": {
+          "type": "string",
+          "description": "Host used for DNS resolution tests."
+        },
+        "http_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL used for HTTP connectivity tests."
+        },
+        "ping_timeout": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Ping timeout in milliseconds."
+        }
+      },
+      "required": [
+        "ping_host",
+        "dns_host",
+        "http_url",
+        "ping_timeout"
+      ],
+      "additionalProperties": false
+    },
+    "speedtest": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enables or disables automatic speed tests."
+        },
+        "interval": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Speed test interval in seconds."
+        },
+        "tool_path": {
+          "type": "string",
+          "description": "Optional path to the Ookla Speedtest CLI."
+        }
+      },
+      "required": [
+        "enabled",
+        "interval",
+        "tool_path"
+      ],
+      "additionalProperties": false
+    },
+    "database": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Path to the SQLite database."
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "additionalProperties": false
+    },
+    "export": {
+      "type": "object",
+      "properties": {
+        "directory": {
+          "type": "string",
+          "description": "Directory used for generated exports."
+        }
+      },
+      "required": [
+        "directory"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "monitor",
+    "connectivity",
+    "speedtest",
+    "database",
+    "export"
+  ],
+  "additionalProperties": false
+}

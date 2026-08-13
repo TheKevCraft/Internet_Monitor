@@ -1,4 +1,7 @@
 <Solution>
   <Project Path="InternetMonitor.CLI/InternetMonitor.CLI.csproj" />
   <Project Path="InternetMonitor.Core/InternetMonitor.Core.csproj" />
+  <Project Path="InternetMonitor.Service/InternetMonitor.Service.csproj" Id="f3ad1a06-aa3e-4bc9-b610-b26a870e3a13">
+    <BuildDependency Project="InternetMonitor.Core/InternetMonitor.Core.csproj" />
+  </Project>
 </Solution>

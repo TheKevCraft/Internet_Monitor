@@ -1,4 +1,4 @@
-using InternetMonitor.Core.Config;
+using InternetMonitor.Core.Configs.Options;
 using Microsoft.Data.Sqlite;
 
 namespace InternetMonitor.Core.Data;
@@ -7,9 +7,9 @@ public class SqliteConnectionFactory
 {
     private readonly string _connectionString;
 
-    public SqliteConnectionFactory(DatabaseOptions options)
+    public SqliteConnectionFactory(MonitorOptions options)
     {
-         var path = Path.GetFullPath(options.Path);
+         var path = ApplicationPaths.Resolve(options.Database.Path);
 
         Directory.CreateDirectory(
             Path.GetDirectoryName(path)!);

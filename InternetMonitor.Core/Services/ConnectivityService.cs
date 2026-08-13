@@ -1,8 +1,7 @@
-﻿using InternetMonitor.Core.Config;
+﻿using InternetMonitor.Core.Configs.Options;
 using InternetMonitor.Core.Interfaces;
 using InternetMonitor.Core.Models;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.NetworkInformation;
 
@@ -11,13 +10,13 @@ namespace InternetMonitor.Core.Services;
 public class ConnectivityService : IConnectivityService
 {
     private readonly HttpClient _httpClient;
-    private readonly ConnectivityOptions _options;
+    private readonly ConnectivitySettings _options;
     private readonly ILogger<ConnectivityService> _logger;
 
-    public ConnectivityService(HttpClient httpClient, IOptions<ConnectivityOptions> options, ILogger<ConnectivityService> logger)
+    public ConnectivityService(HttpClient httpClient, MonitorOptions options, ILogger<ConnectivityService> logger)
     {
         _httpClient = httpClient;
-        _options = options.Value;
+        _options = options.Connectivity;
         _logger = logger;
     }
 

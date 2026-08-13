@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-InternetMonitor.Service-d0c030b1-1226-4f03-9b2b-bd57e966bf97</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\InternetMonitor.Core\InternetMonitor.Core.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\Tools\speedtest\**\*">
+			<Link>Tools\speedtest\%(RecursiveDir)%(Filename)%(Extension)</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+</Project>

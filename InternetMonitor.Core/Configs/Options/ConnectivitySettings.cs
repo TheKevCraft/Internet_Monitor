@@ -1,6 +1,6 @@
-namespace InternetMonitor.Core.Config;
+namespace InternetMonitor.Core.Configs.Options;
 
-public class ConnectivityOptions
+public class ConnectivitySettings
 {
     public string PingHost { get; set; } = "1.1.1.1";
     public string DnsHost { get; set; } = "google.com";

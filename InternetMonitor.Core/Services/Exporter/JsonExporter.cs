@@ -1,4 +1,5 @@
 using System.Text.Json;
+using InternetMonitor.Core.Configs.Options;
 using InternetMonitor.Core.Interfaces;
 using InternetMonitor.Core.Models;
 
@@ -8,10 +9,17 @@ internal class JsonExporter : IExporter
 {
     public ExportFormat Format => ExportFormat.Json;
 
+    private static string _basePath = "";
+
     private static readonly JsonSerializerOptions Options = new ()
     {
         WriteIndented = true
     };
+
+    public JsonExporter(MonitorOptions options)
+    {
+        _basePath = ApplicationPaths.Resolve(options.Export.Directory);
+    }
 
     public async Task<ExportResult> ExportAsync(InternetExportData data, CancellationToken token = default)
     {
@@ -31,12 +39,10 @@ internal class JsonExporter : IExporter
 
     private static string CreatePath(string name, string extension)
     {
-        var folder = Path.Combine(AppContext.BaseDirectory, "exports");
-
-        Directory.CreateDirectory(folder);
+        Directory.CreateDirectory(_basePath);
 
         return Path.Combine(
-            folder,
+            _basePath,
             $"{name}_{DateTime.UtcNow:yyyy-MM-dd_HH-mm-ss}.{extension}");
     }
 }

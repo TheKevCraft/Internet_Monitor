@@ -1,5 +1,20 @@
-[Connectivity]
-PingHost = "1.1.1.1"
-DnsHost = "google.com"
-HttpUrl = "https://connectivitycheck.gstatic.com/generate_204"
-PingTimeout = 3000
+[monitor]
+enabled = true
+interval = 60
+
+[connectivity]
+ping_host = "1.1.1.1"
+dns_host = "google.com"
+http_url = "https://connectivitycheck.gstatic.com/generate_204"
+ping_timeout = 3000
+
+[speedtest]
+enabled = true
+interval = 3600
+tool_path = ""
+
+[database]
+path = "/data/InternetMonitor.db"
+
+[export]
+directory = "/exports"

@@ -1,3 +1,4 @@
+using InternetMonitor.Core.Configs.Options;
 using InternetMonitor.Core.Interfaces;
 using InternetMonitor.Core.Models;
 using System.Globalization;
@@ -8,6 +9,13 @@ namespace InternetMonitor.Core.Services.Exporter;
 internal class CsvExporter : IExporter
 {
     public ExportFormat Format => ExportFormat.Csv;
+
+    private static string _basePath = "";
+
+    public CsvExporter(MonitorOptions options)
+    {
+        _basePath = ApplicationPaths.Resolve(options.Export.Directory);
+    }
 
     public async Task<ExportResult> ExportAsync(InternetExportData data, CancellationToken token = default)
     {
@@ -140,9 +148,7 @@ internal class CsvExporter : IExporter
 
     private static string CreateExportFolder()
     {
-        var folder = Path.Combine(
-            AppContext.BaseDirectory,
-            "exports");
+        var folder = _basePath;
 
         Directory.CreateDirectory(folder);
 

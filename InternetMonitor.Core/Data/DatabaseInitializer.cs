@@ -1,6 +1,4 @@
-using InternetMonitor.Core.Config;
 using InternetMonitor.Core.Interfaces;
-using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 
 namespace InternetMonitor.Core.Data;
