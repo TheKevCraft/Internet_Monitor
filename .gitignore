@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 InternetMonitor.CLI/data/*
+/InternetMonitor.Service/data
