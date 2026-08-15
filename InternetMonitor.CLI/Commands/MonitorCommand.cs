@@ -17,11 +17,53 @@ public sealed class MonitorCommand : ICommandModule
         var command = new Command(
             "monitor",
             "Control the Internet Monitor service.");
-        
 
+        //Un/Install
+        command.Add(CreateInstallCommand());
+        command.Add(CreateUninstallCommand());
+
+        // Controlls
+        command.Add(CreateStartCommand());
+        command.Add(CreateStopCommand());
+        command.Add(CreateRestartCommand());
+        command.Add(CreateStatusCommand());
+        command.Add(CreateLogsCommand());
 
         return command;
     }
+
+    private Command CreateInstallCommand()
+    {
+        var command = new Command(
+            "install",
+            "Install the Internet Monitor service.");
+
+        command.SetAction(async (parseResult, token) =>
+        {
+            await _monitorService.InstallAsync(token);
+
+            Console.WriteLine("Internet Monitor service installed.");
+        });
+
+        return command;
+    }
+
+    private Command CreateUninstallCommand()
+    {
+        var command = new Command(
+            "uninstall",
+            "Uninstall the Internet Monitor service.");
+
+        command.SetAction(async (parseResult, token) =>
+        {
+            await _monitorService.UninstallAsync(token);
+
+            Console.WriteLine("Internet Monitor service uninstalled.");
+        });
+
+        return command;
+    }
+
 
     private Command CreateStartCommand()
     {

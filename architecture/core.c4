@@ -1,0 +1,65 @@
+specification {
+    element service
+}
+
+model {
+    extend internetMonitor.core {
+        
+        connectivity = service "Connectivity Service" {
+            description "Checks network connectivity using ping, DNS and HTTP checks."
+        }
+        
+        speedtest = service "SpeedTest Service" {
+            description "Runs Ookla Speedtest and processes speed test results."
+        }
+
+        monitor = service "Monitor Service" {
+            description "Coordinates scheduled connectivity and speed tests."
+        }
+
+        data = service "Data Service" {
+            description 'Provides persistent storage and retrieval of monitoring data.'
+        }
+
+        export = service "Export Service" {
+            description 'Coordinates exporting monitoring data.'
+        }
+
+        exporter = service "IExporter" {
+            description 'Common abstraction for export implementations.'
+        }
+
+        jsonExporter = service "Json Exporter" {
+            description 'Exports monitoring data as JSON.'
+        }
+
+        csvExporter = service "CSV Exporter" {
+            description 'Exports monitoring data as CSV.'
+        }
+
+        pdfExporter = service "PDF Exporter" {
+            description 'Generates PDF reports from monitoring data.'
+        }
+
+        report = service "Report Service" {
+            description 'Creates reports from collected monitoring data.'
+        }
+    }
+
+    internetMonitor.core.monitor -> internetMonitor.core.connectivity "Runs"
+    internetMonitor.core.monitor -> internetMonitor.core.speedtest "Runs"
+
+    internetMonitor.core.connectivity -> internetMonitor.core.data "Stores results"
+    internetMonitor.core.speedtest -> internetMonitor.core.data "Stores results"
+
+    internetMonitor.core.export -> internetMonitor.core.data "Reads data"
+    internetMonitor.core.export -> internetMonitor.core.exporter "Uses"
+
+    internetMonitor.core.jsonExporter -> internetMonitor.core.exporter "Implements"
+    internetMonitor.core.csvExporter -> internetMonitor.core.exporter "Implements"
+    internetMonitor.core.pdfExporter -> internetMonitor.core.exporter "Implements"
+
+    internetMonitor.core.report -> internetMonitor.core.data "Reads data"
+
+    internetMonitor.core.pdfExporter -> internetMonitor.core.report "Uses"
+}

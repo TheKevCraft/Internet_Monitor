@@ -1,0 +1,35 @@
+views {
+    view systemOverview {
+        title "Internet Monitor - System Overview"
+
+        include user
+        include internetMonitor.cli
+        include internetMonitor.core
+        include internetMonitor.service
+        include internetMonitor.database
+        include internetMonitor.speedtest
+        
+        autoLayout TopBottom
+    }
+
+    view appicationArchitecture {
+        title "Internet Monitor - Application Architecture"
+        
+        include internetMonitor.cli
+        include internetMonitor.core
+        include internetMonitor.service
+        include internetMonitor.database
+        include internetMonitor.speedtest
+
+        autoLayout TopBottom
+    }
+
+    view coreArchitecture {
+        title 'InternetMonitor.Core - Architecture'
+        
+        include internetMonitor.core.*
+        include internetMonitor.database
+
+        autoLayout TopBottom
+    }
+}

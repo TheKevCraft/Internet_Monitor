@@ -1,0 +1,171 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
+
+    <PublishRoot>$(MSBuildThisFileDirectory)..\Publish\$(RuntimeIdentifier)\</PublishRoot>
+
+    <CliProject>$(MSBuildThisFileDirectory)..\InternetMonitor.CLI\InternetMonitor.CLI.csproj</CliProject>
+    <ServiceProject>$(MSBuildThisFileDirectory)..\InternetMonitor.Service\InternetMonitor.Service.csproj</ServiceProject>
+
+    <CliPublishDir>$(PublishRoot)CLI\</CliPublishDir>
+    <ServicePublishDir>$(PublishRoot)Service\</ServicePublishDir>
+    <PackageDir>$(PublishRoot)Package\</PackageDir>
+  </PropertyGroup>
+
+
+  <!-- ============================================================
+       Publish CLI
+       ============================================================ -->
+
+  <Target Name="PublishCli">
+
+    <Message Importance="high"
+             Text="Publishing InternetMonitor.CLI..." />
+
+    <MSBuild
+      Projects="$(CliProject)"
+      Targets="Publish"
+      Properties="
+        Configuration=$(Configuration);
+        RuntimeIdentifier=$(RuntimeIdentifier);
+        PublishDir=$(CliPublishDir)" />
+
+  </Target>
+
+
+  <!-- ============================================================
+       Publish Service
+       ============================================================ -->
+
+  <Target Name="PublishService">
+
+    <Message Importance="high"
+             Text="Publishing InternetMonitor.Service..." />
+
+    <MSBuild
+      Projects="$(ServiceProject)"
+      Targets="Publish"
+      Properties="
+        Configuration=$(Configuration);
+        RuntimeIdentifier=$(RuntimeIdentifier);
+        PublishDir=$(ServicePublishDir)" />
+
+  </Target>
+
+
+  <!-- ============================================================
+       Prepare Package
+       ============================================================ -->
+
+  <Target Name="PreparePackage"
+          DependsOnTargets="PublishCli;PublishService">
+
+    <Message Importance="high"
+             Text="Preparing package directory..." />
+
+    <RemoveDir
+      Directories="$(PackageDir)"
+      Condition="Exists('$(PackageDir)')" />
+
+    <MakeDir
+      Directories="$(PackageDir)" />
+
+  </Target>
+
+
+  <!-- ============================================================
+       Package CLI
+       ============================================================ -->
+
+  <Target Name="PackageCli"
+          DependsOnTargets="PreparePackage">
+
+    <ItemGroup>
+      <CliFiles Include="$(CliPublishDir)**\*" />
+    </ItemGroup>
+
+    <Message Importance="high"
+             Text="Copying CLI files..." />
+
+    <Copy
+      SourceFiles="@(CliFiles)"
+      DestinationFiles="@(CliFiles->'$(PackageDir)%(RecursiveDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true" />
+
+  </Target>
+
+
+  <!-- ============================================================
+       Package Service
+       ============================================================ -->
+
+  <Target Name="PackageService"
+          DependsOnTargets="PreparePackage">
+
+    <ItemGroup>
+      <ServiceFiles Include="$(ServicePublishDir)**\*" />
+    </ItemGroup>
+
+    <Message Importance="high"
+             Text="Copying Service files..." />
+
+    <Copy
+      SourceFiles="@(ServiceFiles)"
+      DestinationFiles="@(ServiceFiles->'$(PackageDir)%(RecursiveDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true" />
+
+  </Target>
+
+
+  <!-- ============================================================
+       Package Tools
+       ============================================================ -->
+
+  <Target Name="PackageTools"
+          DependsOnTargets="PreparePackage">
+
+    <ItemGroup Condition="'$(RuntimeIdentifier)' == 'win-x64'">
+      <ToolFiles
+        Include="$(MSBuildThisFileDirectory)..\Tools\speedtest\windows\**\*" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64'">
+      <ToolFiles
+        Include="$(MSBuildThisFileDirectory)..\Tools\speedtest\linux\**\*" />
+    </ItemGroup>
+
+    <Message Importance="high"
+             Text="Copying platform tools..." />
+
+    <Copy
+      SourceFiles="@(ToolFiles)"
+      DestinationFiles="@(ToolFiles->'$(PackageDir)Tools\speedtest\%(RecursiveDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true" />
+
+  </Target>
+
+
+  <!-- ============================================================
+       Complete Package
+       ============================================================ -->
+
+  <Target Name="Publish"
+          DependsOnTargets="PackageCli;PackageService;PackageTools">
+
+    <Message Importance="high"
+             Text="==============================================" />
+
+    <Message Importance="high"
+             Text="Internet Monitor package created:" />
+
+    <Message Importance="high"
+             Text="$(PackageDir)" />
+
+    <Message Importance="high"
+             Text="==============================================" />
+
+  </Target>
+
+</Project>

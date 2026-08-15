@@ -1,0 +1,42 @@
+specification {
+    element actor
+    element system
+    element application
+    element database
+}
+
+model {
+    user = actor "User"
+
+    internetMonitor = system "Internt Monitor" {
+        cli = application "InternetMonitor.CLI" {
+            description "Command-line interface for controlling and using Intenet Monitor."
+        }
+
+        core = application "InternetMonitor.Core" {
+            description "Core services, models, data access and moritoring logic."
+        }
+
+        service = application "InternetMonitor.Service" {
+            description "Background service that runs the Internet moritoring process."
+        }
+
+        database = database "SQLite Database" {
+            description "Stores connectivity and speed test results."
+        }
+
+        speedtest = application "Ookla Speedtest CLI" {
+            description "External Ookla Speedtest command-line tool."
+        }
+    }
+
+    user -> internetMonitor.cli "Uses"
+
+    internetMonitor.cli -> internetMonitor.core "Uses"
+
+    internetMonitor.service -> internetMonitor.core "Uses"
+
+    internetMonitor.core -> internetMonitor.database "Reads and wirtes"
+
+    internetMonitor.core -> internetMonitor.speedtest "Executes"
+}

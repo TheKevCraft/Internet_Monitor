@@ -1,0 +1,12 @@
+{
+	"private": true,
+	"scripts": {
+		"architecture": "likec4 serve ./architecture",
+		"architecture:validate": "likec4 validate ./architecture",
+		"architecture:build": "likec4 build ./architecture -o ./docs/architecture",
+    	"architecture:export": "likec4 export jpg ./architecture -o ./docs/architecture"
+	},
+	"devDependencies": {
+		"likec4": "^1.59.2"
+	}
+}
