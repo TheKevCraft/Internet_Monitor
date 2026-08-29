@@ -1,0 +1,57 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:InternetMonitor.UI.ViewModels"
+        xmlns:views="using:InternetMonitor.UI.Views"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" 
+        d:DesignWidth="1280" 
+        d:DesignHeight="720"
+        x:Class="InternetMonitor.UI.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="InternetMonitor"
+        MinWidth="640"
+        MinHeight="360">
+
+    <!--<Design.DataContext>
+        < This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) 
+        <vm:MainViewModel />
+    </Design.DataContext>-->
+    <Grid RowDefinitions="Auto,*">
+        <!-- Global Window Title -->
+        <StackPanel Grid.Row="0"
+                    Margin="20,18,20,0"
+                    Spacing="4">
+
+            <TextBlock Text="Internet Monitor"
+                       FontSize="28"
+                       FontWeight="Bold" />
+
+            <TextBlock Text="Uberwachung und Steuerung der Internetverbindung"
+                       Opacity="0.7" />
+            
+        </StackPanel>
+
+        <!-- Main NAV -->
+        <TabControl Grid.Row="1"
+                    Margin="20">
+            <TabItem Header="Dashboard">
+                <views:DashboardView DataContext="{Binding Dashboard}" />
+            </TabItem>
+            <TabItem Header="Historie">
+                <TextBlock Text="History folgt spater."
+                           Margin="20" />
+            </TabItem>
+            <TabItem Header="Logs">
+                <TextBlock Text="Logs folgt spater."
+                           Margin="20" />
+            </TabItem>
+            <TabItem Header="Einstellungen">
+                <TextBlock Text="Einstellungen folgt spater."
+                           Margin="20" />
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

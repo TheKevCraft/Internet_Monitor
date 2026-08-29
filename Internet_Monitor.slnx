@@ -1,8 +1,14 @@
 <Solution>
-  <Project Path="InternetMonitor.CLI/InternetMonitor.CLI.csproj" />
+  <Project Path="InternetMonitor.CLI/InternetMonitor.CLI.csproj">
+    <BuildDependency Project="InternetMonitor.Infrastructure/InternetMonitor.Infrastructure.csproj" />
+  </Project>
   <Project Path="InternetMonitor.Core/InternetMonitor.Core.csproj" />
+  <Project Path="InternetMonitor.Infrastructure/InternetMonitor.Infrastructure.csproj" Id="9d14da85-1276-45cf-b5c7-12d0f2e2d50d" />
   <Project Path="InternetMonitor.Publish/InternetMonitor.Publish.csproj" Id="6bc2a76c-ae1c-47c2-b252-cb167e0706d1" />
   <Project Path="InternetMonitor.Service/InternetMonitor.Service.csproj" Id="f3ad1a06-aa3e-4bc9-b610-b26a870e3a13">
     <BuildDependency Project="InternetMonitor.Core/InternetMonitor.Core.csproj" />
+  </Project>
+  <Project Path="InternetMonitor.UI/InternetMonitor.UI.csproj" Id="40dc356a-909b-4058-8f85-a684ca18654b">
+    <BuildDependency Project="InternetMonitor.Infrastructure/InternetMonitor.Infrastructure.csproj" />
   </Project>
 </Solution>

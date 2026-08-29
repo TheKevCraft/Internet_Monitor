@@ -56,11 +56,22 @@ public class DatabaseInitializer : IDatabaseInitializer
             ServerLocation TEXT
         );
 
+        CREATE TABLE IF NOT EXISTS MonitorEvents
+        (
+            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            Timestamp TEXT NOT NULL,
+            Type INTEGER NOT NULL,
+            Severity INTEGER NOT NULL,
+            Source TEXT NOT NULL,
+            Message TEXT NOT NULL,
+            Details TEXT NULL
+        );
+
         CREATE INDEX IF NOT EXISTS IX_ConnectivityResults_Timestamp
         ON ConnectivityResults(Timestamp DESC);
 
         CREATE INDEX IF NOT EXISTS IX_SpeedTests_Timestamp
-        On SpeedTests(Timestamp DESC);
+        ON SpeedTests(Timestamp DESC);
         """;
 
         try

@@ -8,18 +8,40 @@
 
     <CliProject>$(MSBuildThisFileDirectory)..\InternetMonitor.CLI\InternetMonitor.CLI.csproj</CliProject>
     <ServiceProject>$(MSBuildThisFileDirectory)..\InternetMonitor.Service\InternetMonitor.Service.csproj</ServiceProject>
+    <UiProject>$(MSBuildThisFileDirectory)..\InternetMonitor.UI\InternetMonitor.UI.csproj</UiProject>
 
     <CliPublishDir>$(PublishRoot)CLI\</CliPublishDir>
     <ServicePublishDir>$(PublishRoot)Service\</ServicePublishDir>
+    <UiPublishDir>$(PublishRoot)UI\</UiPublishDir>
     <PackageDir>$(PublishRoot)Package\</PackageDir>
   </PropertyGroup>
+
+
+  <!-- ============================================================
+       Restore all publish projects for the selected runtime
+       ============================================================ -->
+
+  <Target Name="RestoreProjects">
+
+    <Message Importance="high"
+             Text="Restoring projects for $(RuntimeIdentifier)..." />
+
+    <MSBuild
+      Projects="$(CliProject);$(ServiceProject);$(UiProject)"
+      Targets="Restore"
+      Properties="
+        Configuration=$(Configuration);
+        RuntimeIdentifier=$(RuntimeIdentifier)" />
+
+  </Target>
 
 
   <!-- ============================================================
        Publish CLI
        ============================================================ -->
 
-  <Target Name="PublishCli">
+  <Target Name="PublishCli"
+          DependsOnTargets="RestoreProjects">
 
     <Message Importance="high"
              Text="Publishing InternetMonitor.CLI..." />
@@ -30,6 +52,7 @@
       Properties="
         Configuration=$(Configuration);
         RuntimeIdentifier=$(RuntimeIdentifier);
+        Restore=true;
         PublishDir=$(CliPublishDir)" />
 
   </Target>
@@ -50,17 +73,37 @@
       Properties="
         Configuration=$(Configuration);
         RuntimeIdentifier=$(RuntimeIdentifier);
+        Restore=true;
         PublishDir=$(ServicePublishDir)" />
 
   </Target>
 
 
   <!-- ============================================================
-       Prepare Package
+       Publish UI
        ============================================================ -->
 
+  <Target Name="PublishUi">
+
+    <Message Importance="high"
+             Text="Publishing InternetMonitor.UI..." />
+
+    <MSBuild
+      Projects="$(UiProject)"
+      Targets="Publish"
+      Properties="
+        Configuration=$(Configuration);
+        RuntimeIdentifier=$(RuntimeIdentifier);
+        Restore=true;
+        SelfContained=true;
+        PublishSingleFile=false;
+        PublishDir=$(UiPublishDir)" />
+
+  </Target>
+
+
   <Target Name="PreparePackage"
-          DependsOnTargets="PublishCli;PublishService">
+          DependsOnTargets="PublishCli;PublishService;PublishUi">
 
     <Message Importance="high"
              Text="Preparing package directory..." />
@@ -91,7 +134,7 @@
 
     <Copy
       SourceFiles="@(CliFiles)"
-      DestinationFiles="@(CliFiles->'$(PackageDir)%(RecursiveDir)%(Filename)%(Extension)')"
+      DestinationFiles="@(CliFiles->'$(PackageDir)CLI\%(RecursiveDir)%(Filename)%(Extension)')"
       SkipUnchangedFiles="true" />
 
   </Target>
@@ -113,15 +156,33 @@
 
     <Copy
       SourceFiles="@(ServiceFiles)"
-      DestinationFiles="@(ServiceFiles->'$(PackageDir)%(RecursiveDir)%(Filename)%(Extension)')"
+      DestinationFiles="@(ServiceFiles->'$(PackageDir)Service\%(RecursiveDir)%(Filename)%(Extension)')"
       SkipUnchangedFiles="true" />
 
   </Target>
 
 
   <!-- ============================================================
-       Package Tools
+       Package UI
        ============================================================ -->
+
+  <Target Name="PackageUi"
+          DependsOnTargets="PreparePackage">
+
+    <ItemGroup>
+      <UiFiles Include="$(UiPublishDir)**\*" />
+    </ItemGroup>
+
+    <Message Importance="high"
+             Text="Copying UI files..." />
+
+    <Copy
+      SourceFiles="@(UiFiles)"
+      DestinationFiles="@(UiFiles->'$(PackageDir)UI\%(RecursiveDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true" />
+
+  </Target>
+
 
   <Target Name="PackageTools"
           DependsOnTargets="PreparePackage">
@@ -152,7 +213,7 @@
        ============================================================ -->
 
   <Target Name="Publish"
-          DependsOnTargets="PackageCli;PackageService;PackageTools">
+          DependsOnTargets="PackageCli;PackageService;PackageUi;PackageTools">
 
     <Message Importance="high"
              Text="==============================================" />

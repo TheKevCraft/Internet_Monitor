@@ -5,11 +5,20 @@ using System.Diagnostics;
 using System.Runtime.Versioning;
 using System.ServiceProcess;
 
-namespace InternetMonitor.CLI.Services;
+namespace InternetMonitor.Infrastructure.Windows;
 
 [SupportedOSPlatform("windows")]
 internal class WindowsMonitorServiceController : IMonitorServiceController
 {
+    private readonly IServiceLogProvider _logProvider;
+
+    public WindowsMonitorServiceController(IServiceLogProvider logProvider)
+    {
+        _logProvider = logProvider;
+    }
+
+
+
     #region install
 
     public async Task InstallAsync(CancellationToken token = default)
@@ -31,7 +40,7 @@ internal class WindowsMonitorServiceController : IMonitorServiceController
                 executionPath);
         }
 
-        if (ServiceExistsAsync(MonitorServiceConstants.ServiceName))
+        if (ServiceExists())
         {
             throw new InvalidOperationException(
                 $"The Windows service '{MonitorServiceConstants.ServiceName}' is already installed.");
@@ -60,7 +69,7 @@ internal class WindowsMonitorServiceController : IMonitorServiceController
                 "The Windows service controller can only be used on Windows.");
         }
 
-        if (!ServiceExistsAsync(MonitorServiceConstants.ServiceName))
+        if (!ServiceExists())
         {
             return;
         }
@@ -137,6 +146,18 @@ internal class WindowsMonitorServiceController : IMonitorServiceController
     {
         token.ThrowIfCancellationRequested();
 
+        if (!ServiceExists())
+        {
+            return Task.FromResult(
+                new MonitorServiceStatus
+                {
+                    IsInstalled = false,
+                    IsRunning = false,
+                    Status = "Not installed",
+                    Details = "The Windows-Service was not found."
+                });
+        }
+
         using var service = new ServiceController(MonitorServiceConstants.ServiceName);
 
         service.Refresh();
@@ -144,6 +165,7 @@ internal class WindowsMonitorServiceController : IMonitorServiceController
         return Task.FromResult(
             new MonitorServiceStatus
             {
+                IsInstalled = true,
                 IsRunning = service.Status == ServiceControllerStatus.Running,
                 Status = service.Status.ToString(),
                 Details = $"Windows Service: {MonitorServiceConstants.ServiceName}"
@@ -156,13 +178,7 @@ internal class WindowsMonitorServiceController : IMonitorServiceController
     {
         token.ThrowIfCancellationRequested();
 
-        // Wird mit dem Logging/EventLog-System erganzt.
-        IReadOnlyList<string> logs =
-            [
-                "Service logging is not implemented yet."
-            ];
-
-        return Task.FromResult(logs);
+        return _logProvider.GetLogsAsync(lines, token);
     }
 
     #endregion
@@ -171,16 +187,32 @@ internal class WindowsMonitorServiceController : IMonitorServiceController
 
     private static string GetServiceExecutablePath()
     {
+        var applicationDirectory = new DirectoryInfo(AppContext.BaseDirectory).Parent
+            ?? throw new InvalidOperationException(
+                "The application directory could not be determined.");
+
         var path = Path.Combine(
-            AppContext.BaseDirectory,
+            applicationDirectory.FullName,
+            "Service",
             MonitorServiceConstants.ExecutableName);
+
+        /*var path = Path.Combine(
+            AppContext.BaseDirectory,
+            "Service",
+            MonitorServiceConstants.ExecutableName);*/
 
         return Path.GetFullPath(path);
     }
 
-    private static bool ServiceExistsAsync(string serviceName)
+    private static bool ServiceExists(/*string serviceName*/)
     {
-        try
+        return ServiceController
+            .GetServices()
+            .Any(service =>
+                service.ServiceName.Equals(
+                    MonitorServiceConstants.ServiceName,
+                    StringComparison.OrdinalIgnoreCase));
+        /*try
         {
             using var service = new ServiceController(serviceName);
 
@@ -193,7 +225,7 @@ internal class WindowsMonitorServiceController : IMonitorServiceController
         catch (InvalidOperationException)
         {
             return false;
-        }
+        }*/
     }
 
     private static async Task RunScAsync(string args, CancellationToken token)

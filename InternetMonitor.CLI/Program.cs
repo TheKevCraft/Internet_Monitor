@@ -1,7 +1,7 @@
 ﻿using InternetMonitor.Cli.Commands;
-using InternetMonitor.CLI;
 using InternetMonitor.Core.Extensions;
 using InternetMonitor.Core.Interfaces;
+using InternetMonitor.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.CommandLine;
@@ -9,7 +9,7 @@ using System.CommandLine;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.AddInternetMonitorCore();
-builder.Services.AddInternetMonitorCli();
+builder.Services.AddInternetMonitorInfrastructure();
 
 builder.Services.AddTransient<SpeedTestCommand>();
 builder.Services.AddTransient<ConnectivityCommand>();

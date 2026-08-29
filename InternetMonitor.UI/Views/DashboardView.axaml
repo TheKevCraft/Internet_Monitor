@@ -1,0 +1,211 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:InternetMonitor.UI.ViewModels"
+             mc:Ignorable="d"
+             x:Class="InternetMonitor.UI.Views.DashboardView"
+             x:DataType="vm:DashboardViewModel">
+  
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+                
+        <StackPanel Spacing="20">
+            <!-- Worker Control -->
+            <Border Background="#20252B"
+                    CornerRadius="10"
+                    Padding="20">
+
+                <StackPanel Spacing="14">
+                    <Grid ColumnDefinitions="Auto,*,Auto"
+                          ColumnSpacing="14">
+                        
+                        <Ellipse Width="16"
+                                 Height="16"
+                                 Fill="#45C46B"
+                                 VerticalAlignment="Center" />
+
+                        <StackPanel Grid.Column="1"
+                                    Spacing="4">
+
+                            <TextBlock Text="Worker-Status"
+                                       FontSize="14"
+                                       Opacity="0.7" />
+
+                            <TextBlock Text="{Binding WorkerStatus}"
+                                       FontSize="22"
+                                       FontWeight="SemiBold" />
+
+                            <TextBlock Text="{Binding WorkerDetails}"
+                                       Opacity="0.7" />
+                            
+                        </StackPanel>
+                        <Button Grid.Column="2"
+                                Content="Aktualisieren"
+                                Command="{Binding RefreshCommand}"
+                                IsEnabled="{Binding IsNotBusy}"
+                                Padding="16,9" />
+
+                    </Grid>
+                    <Border Background="#2B3138"
+                            CornerRadius="8"
+                            Padding="14">
+                    
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Service-Steuerung"
+                                       FontSize="16"
+                                       FontWeight="SemiBold" />
+
+                            <WrapPanel Orientation="Horizontal"
+                                       ItemSpacing="8"
+                                       LineSpacing="8"
+                                        >
+                            
+                                <Button Content="Installieren"
+                                        Command="{Binding InstallWorkerCommand}"
+                                        IsVisible="{Binding ShowInstallButton}"
+                                        Padding="14,8" />
+
+                                <Button Content="Starten"
+                                        Command="{Binding StartWorkerCommand}"
+                                        IsVisible="{Binding ShowStartButton}"
+                                        Padding="14,8" />
+
+                                <Button Content="Deinstallieren"
+                                        Command="{Binding UninstallWorkerCommand}"
+                                        IsVisible="{Binding ShowUninstallButton}"
+                                        Padding="14,8" />
+
+                                <Button Content="Stoppen"
+                                        Command="{Binding StopWorkerCommand}"
+                                        IsVisible="{Binding ShowStopButton}"
+                                        Padding="14,8" />
+
+                                <Button Content="Neustarten"
+                                        Command="{Binding RestartWorkerCommand}"
+                                        IsVisible="{Binding ShowRestartButton}"
+                                        Padding="14,8" />
+                            
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+                    <TextBlock Text="{Binding ErrorMessage}"
+                               Foreground="#FF7777"
+                               IsVisible="{Binding ErrorMessage}" />
+
+                </StackPanel> 
+            </Border>
+            <!-- Connectivity -->
+            <Grid ColumnDefinitions="*,*,*"
+                  RowDefinitions="Auto,Auto"
+                  ColumnSpacing="14"
+                  RowSpacing="14">
+                    
+                <Border Background="#20252B"
+                        CornerRadius="10"
+                        Padding="18">
+                        
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Verbindung"
+                                   Opacity="0.7" />
+
+                        <TextBlock Text="{Binding ConnectivityStatus}"
+                                   FontSize="25"
+                                   FontWeight="Bold"
+                                   Foreground="#45C46B" />
+
+                        <TextBlock Text="{Binding LastCheck}" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1"
+                        Background="#20252B"
+                        CornerRadius="10"
+                        Padding="18">
+                        
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Ping"
+                                   Opacity="0.7" />
+
+                        <TextBlock Text="{Binding Ping}"
+                                   FontSize="25"
+                                   FontWeight="Bold" />
+
+                        <TextBlock Text="Letzte Messung"
+                                   Opacity="0.7" />
+                    
+                    </StackPanel>
+                </Border>
+                <Border Grid.Row="1"
+                        Background="#20252B"
+                        CornerRadius="10"
+                        Padding="18">
+                        
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Download"
+                                   Opacity="0.7" />
+
+                        <TextBlock Text="{Binding Download}"
+                                   FontSize="25"
+                                   FontWeight="Bold" />
+                        
+                    </StackPanel>
+                </Border>
+                <Border Grid.Row="1"
+                        Grid.Column="1"
+                        Background="#20252B"
+                        CornerRadius="10"
+                        Padding="18">
+                        
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Upload"
+                                   Opacity="0.7" />
+
+                        <TextBlock Text="{Binding Upload}"
+                                   FontSize="25"
+                                   FontWeight="Bold" />
+                        
+                    </StackPanel>
+                </Border>
+                <Border Grid.Row="1"
+                        Grid.Column="2"
+                        Background="#20252B"
+                        CornerRadius="10"
+                        Padding="18">
+                        
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Letzte Aktualisierung"
+                                   Opacity="0.7" />
+
+                        <TextBlock Text="{Binding LastCheck}"
+                                   FontSize="17"
+                                   FontWeight="SemiBold" />
+                        
+                    </StackPanel>
+                </Border>
+            </Grid>
+            <Border Background="#20252B"
+                    CornerRadius="10"
+                    Padding="18">
+                    
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Schnellaktionen"
+                               FontSize="18"
+                               FontWeight="SemiBold" />
+
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="10">
+                            
+                        <Button Content="Connectivity prufen"
+                                Padding="15,9" />
+
+                        <Button Content="Speedtest starten"
+                                Padding="15,9" />
+
+                        <Button Content="Logs anzeigen"
+                                Padding="15,9" />
+                        
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
